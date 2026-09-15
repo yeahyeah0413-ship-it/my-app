@@ -13,7 +13,24 @@ export default async function AdminPage() {
   const user = data?.claims;
 
   if (!user) redirect("/login");
-  if (user.app_metadata?.role !== "admin") redirect("/");
+
+  if (user.app_metadata?.role !== "admin") {
+    return (
+      <div className="mx-auto flex max-w-sm flex-col items-center gap-3 px-4 py-24 text-center text-sm">
+        <p className="text-base font-semibold">관리자 권한이 없는 계정입니다</p>
+        <p className="opacity-60">
+          이 화면은 관리자 계정으로 로그인해야 볼 수 있습니다. 관리자 권한이 필요하면 재경팀에 문의해 주십시오.
+        </p>
+        <Link
+          href="/"
+          className="mt-2 rounded-full border border-black/15 px-4 py-1.5 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+        >
+          챗봇으로 돌아가기
+        </Link>
+        <LogoutButton />
+      </div>
+    );
+  }
 
   const [{ count: totalCount }, { count: unansweredCount }, { data: recentUnanswered }] =
     await Promise.all([
