@@ -6,7 +6,7 @@
 
 import { useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import type { HighlightRange } from "@/lib/chatbot";
+import type { CellHighlight, HighlightRange } from "@/lib/chatbot";
 import { DEPARTMENTS, type AnswerTable, type Owner } from "@/lib/knowledge";
 
 type Message = {
@@ -24,6 +24,8 @@ type Message = {
   afterNote?: string;
   /** 표에서 강조할 행 id */
   highlightRowIds?: string[];
+  /** 질문의 특정 단어(국가명 등)에 맞춰 표 안 특정 셀만 강조할 위치 */
+  cellHighlights?: CellHighlight[];
   elapsedMs?: number;
   /** 이 답변의 chat_logs 행 id. 좋아요/싫어요를 이 값으로 이어붙인다 (봇 답변에만 있다) */
   logId?: string;
@@ -57,8 +59,16 @@ function renderHighlighted(text: string, highlights?: HighlightRange[]) {
   return nodes;
 }
 
-/** 답변에 곁들여진 표를 렌더링한다. 금액이 읽힌 경우 해당 행을 강조한다 */
-function AnswerTables({ tables, highlightRowIds }: { tables: AnswerTable[]; highlightRowIds?: string[] }) {
+/** 답변에 곁들여진 표를 렌더링한다. 금액이 읽힌 경우 해당 행을, 국가명 등이 읽힌 경우 해당 셀을 강조한다 */
+function AnswerTables({
+  tables,
+  highlightRowIds,
+  cellHighlights,
+}: {
+  tables: AnswerTable[];
+  highlightRowIds?: string[];
+  cellHighlights?: CellHighlight[];
+}) {
   return (
     <div className="space-y-3">
       {tables.map((table, tableIndex) => (
@@ -87,11 +97,16 @@ function AnswerTables({ tables, highlightRowIds }: { tables: AnswerTable[]; high
                           : "border-t border-black/10 even:bg-black/[0.02] dark:border-white/15 dark:even:bg-white/[0.03]"
                       }
                     >
-                      {row.cells.map((cell, cellIndex) => (
-                        <td key={cellIndex} className="px-2.5 py-1.5 align-top tabular-nums">
-                          {cell}
-                        </td>
-                      ))}
+                      {row.cells.map((cell, cellIndex) => {
+                        const cellRanges = cellHighlights?.find(
+                          (c) => c.rowId === row.id && c.cellIndex === cellIndex,
+                        )?.ranges;
+                        return (
+                          <td key={cellIndex} className="px-2.5 py-1.5 align-top tabular-nums">
+                            {cellRanges ? renderHighlighted(cell, cellRanges) : cell}
+                          </td>
+                        );
+                      })}
                     </tr>
                   );
                 })}
@@ -219,6 +234,7 @@ export default function Page() {
           tables: data.tables,
           afterNote: data.afterNote,
           highlightRowIds: data.highlightRowIds,
+          cellHighlights: data.cellHighlights,
           elapsedMs: data.elapsedMs,
           logId: data.logId,
         },
@@ -372,7 +388,11 @@ export default function Page() {
                   </p>
 
                   {msg.tables && msg.tables.length > 0 && (
-                    <AnswerTables tables={msg.tables} highlightRowIds={msg.highlightRowIds} />
+                    <AnswerTables
+                      tables={msg.tables}
+                      highlightRowIds={msg.highlightRowIds}
+                      cellHighlights={msg.cellHighlights}
+                    />
                   )}
 
                   {msg.afterNote && (

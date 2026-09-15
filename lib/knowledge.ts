@@ -44,6 +44,18 @@ export type MatchTier = {
   label: string;
 };
 
+/**
+ * 표 답변에서, 질문의 특정 단어(국가명 등)에 맞춰 해당 행을 강조하고 싶을 때 쓴다.
+ * 급지 라벨처럼 셀 전체를 강조할 열(labelCellIndex)과, 매칭된 단어 위치만 찾아 강조할
+ * 열(wordCellIndex)을 나눠서 지정한다. rowId는 tables 안 그 행의 id와 같아야 한다.
+ */
+export type MatchCellTier = {
+  match: string[];
+  rowId: string;
+  labelCellIndex: number;
+  wordCellIndex: number;
+};
+
 /** 사내 가이드 문서 한 건 */
 export type GuideEntry = {
   id: string;
@@ -66,6 +78,8 @@ export type GuideEntry = {
   amountTiers?: AmountTier[];
   /** 질문의 특정 단어에 맞춰 answer 안의 다른 문구도 함께 강조하고 싶을 때 쓴다 */
   matchTiers?: MatchTier[];
+  /** 질문의 특정 단어에 맞춰 tables 안 특정 셀을 강조하고 싶을 때 쓴다 */
+  tableMatchTiers?: MatchCellTier[];
   /** 텍스트 나열보다 표가 더 읽기 쉬운 내용을 별도로 담는다. 여러 벌이면 순서대로 표시된다. */
   tables?: AnswerTable[];
   /** 표 아래에 덧붙일 부연 설명 (표로 옮기지 않은 나머지 텍스트) */
@@ -540,13 +554,41 @@ export const GUIDE_ENTRIES: GuideEntry[] = [
       "해외 출장",
       "해외 급지",
     ],
-    answer:
-      "출장 지역별 급지 구분은 다음과 같습니다.\n· A급지: 싱가포르·대만·홍콩·인도·일본을 제외한 모든 아시아 국가, 중동 및 유럽 전역(B급지 유럽 국가 제외), 중남미 전역, 아프리카 등\n· B급지: 싱가포르·대만·홍콩·인도, 서유럽(그리스 제외 - 영국, 아일랜드, 프랑스, 네덜란드, 벨기에, 스페인, 포르투갈, 독일, 스위스, 이탈리아, 오스트리아), 미국(C급지 도시 제외) 및 캐나다 전역, 호주·뉴질랜드 전역\n· C급지: 미국의 뉴욕, LA, 보스턴, 샌프란시스코, 워싱턴, 시카고\n· 일본: 별도 급지\n급지별 금액은 1박당 숙박비 A USD 160 / B USD 250 / C USD 350 / 일본 JPY 25,000이며, 출장여비는 임원 외 기준 A USD 90 / B USD 120 / C USD 150 / 일본 JPY 10,000입니다.",
+    answer: "출장 지역별 급지 구분은 다음과 같습니다.",
     source: "제이시스메디칼 경비규정 제4조 다) 해외 여비교통비 <출장 지역별 급지 기준표>",
-    matchTiers: [
+    tables: [
+      {
+        headers: ["급지", "지역"],
+        rows: [
+          {
+            id: "area-a",
+            cells: [
+              "A급지",
+              "싱가포르·대만·홍콩·인도·일본을 제외한 모든 아시아 국가, 중동 및 유럽 전역(B급지 유럽 국가 제외), 중남미 전역, 아프리카 등",
+            ],
+          },
+          {
+            id: "area-b",
+            cells: [
+              "B급지",
+              "싱가포르·대만·홍콩·인도, 서유럽(그리스 제외 - 영국, 아일랜드, 프랑스, 네덜란드, 벨기에, 스페인, 포르투갈, 독일, 스위스, 이탈리아, 오스트리아), 미국(C급지 도시 제외) 및 캐나다 전역, 호주·뉴질랜드 전역",
+            ],
+          },
+          {
+            id: "area-c",
+            cells: ["C급지", "미국의 뉴욕, LA, 보스턴, 샌프란시스코, 워싱턴, 시카고"],
+          },
+          { id: "area-jp", cells: ["일본", "별도 급지"] },
+        ],
+      },
+    ],
+    afterNote: "급지별 숙박비·출장여비 금액은 급지별 기준표를 참고해 주십시오.",
+    tableMatchTiers: [
       {
         match: ["중동", "중남미", "아프리카", "아시아", "중국", "베트남", "태국", "유럽", "그리스"],
-        label: "· A급지:",
+        rowId: "area-a",
+        labelCellIndex: 0,
+        wordCellIndex: 1,
       },
       {
         match: [
@@ -573,13 +615,17 @@ export const GUIDE_ENTRIES: GuideEntry[] = [
           "뉴질랜드",
           "오세아니아",
         ],
-        label: "· B급지:",
+        rowId: "area-b",
+        labelCellIndex: 0,
+        wordCellIndex: 1,
       },
       {
         match: ["뉴욕", "LA", "로스앤젤레스", "보스턴", "샌프란시스코", "워싱턴", "시카고"],
-        label: "· C급지:",
+        rowId: "area-c",
+        labelCellIndex: 0,
+        wordCellIndex: 1,
       },
-      { match: ["일본"], label: "· 일본:" },
+      { match: ["일본"], rowId: "area-jp", labelCellIndex: 0, wordCellIndex: 1 },
     ],
   },
   {

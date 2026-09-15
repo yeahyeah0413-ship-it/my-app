@@ -13,6 +13,7 @@ import {
   type Category,
   type Department,
   type GuideEntry,
+  type MatchCellTier,
   type MatchTier,
   type Owner,
   type Staff,
@@ -23,6 +24,9 @@ const ANSWER_THRESHOLD = 2;
 
 /** message 문자열 안의 한 구간. 화면에서 이 부분만 강조 표시한다. */
 export type HighlightRange = { start: number; end: number };
+
+/** 표의 특정 셀(rowId + cellIndex) 안에서 강조할 구간 */
+export type CellHighlight = { rowId: string; cellIndex: number; ranges: HighlightRange[] };
 
 export type ChatAnswer = {
   /** 가이드 문서에서 근거를 찾았는지 여부 */
@@ -43,6 +47,8 @@ export type ChatAnswer = {
   afterNote?: string;
   /** 금액이 읽힌 경우, tables 안에서 강조할 행 id */
   highlightRowIds?: string[];
+  /** 질문의 특정 단어(국가명 등)에 맞춰 tables 안 특정 셀만 강조할 위치 */
+  cellHighlights?: CellHighlight[];
   /** 매칭된 문의 유형 (운영 현황 통계용) */
   category?: Category;
 };
@@ -145,6 +151,50 @@ function pickMatchTierHighlights(entry: GuideEntry, normalizedQuestion: string):
     if (keywordRange) ranges.push(keywordRange);
   }
   return ranges;
+}
+
+/** tables 안에서 rowId·cellIndex로 지정한 셀의 텍스트를 찾는다. 없으면 null. */
+function findCellText(
+  tables: AnswerTable[] | undefined,
+  rowId: string,
+  cellIndex: number,
+): string | null {
+  if (!tables) return null;
+  for (const table of tables) {
+    const row = table.rows.find((r) => r.id === rowId);
+    if (row) return row.cells[cellIndex] ?? null;
+  }
+  return null;
+}
+
+/**
+ * 질문의 특정 단어(국가명 등)에 맞춰, 표 안 해당 행의 급지 라벨 셀 전체와
+ * 그 단어가 있는 셀에서는 그 단어 부분만 강조 대상으로 고른다.
+ */
+function pickTableMatchHighlights(entry: GuideEntry, normalizedQuestion: string): CellHighlight[] {
+  if (!entry.tableMatchTiers) return [];
+
+  const result: CellHighlight[] = [];
+  for (const tier of entry.tableMatchTiers as MatchCellTier[]) {
+    const matchedKeyword = tier.match.find((m) => normalizedQuestion.includes(normalize(m)));
+    if (!matchedKeyword) continue;
+
+    const labelText = findCellText(entry.tables, tier.rowId, tier.labelCellIndex);
+    if (labelText) {
+      result.push({
+        rowId: tier.rowId,
+        cellIndex: tier.labelCellIndex,
+        ranges: [{ start: 0, end: labelText.length }],
+      });
+    }
+
+    const wordText = findCellText(entry.tables, tier.rowId, tier.wordCellIndex);
+    const wordRange = wordText ? findRange(wordText, matchedKeyword) : null;
+    if (wordRange) {
+      result.push({ rowId: tier.rowId, cellIndex: tier.wordCellIndex, ranges: [wordRange] });
+    }
+  }
+  return result;
 }
 
 /**
@@ -348,6 +398,7 @@ export function answerQuestion(
       ...pickKeywordHighlights(best, normalizedQuestion),
       ...pickMatchTierHighlights(best, normalizedQuestion),
     ];
+    const cellHighlights = pickTableMatchHighlights(best, normalizedQuestion);
     return {
       answered: true,
       message: best.answer,
@@ -357,6 +408,7 @@ export function answerQuestion(
       ...(best.tables ? { tables: best.tables } : {}),
       ...(best.afterNote ? { afterNote: best.afterNote } : {}),
       ...(amountPick.rowIds.length ? { highlightRowIds: amountPick.rowIds } : {}),
+      ...(cellHighlights.length ? { cellHighlights } : {}),
       category: best.category,
     };
   }
