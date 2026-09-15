@@ -4,8 +4,8 @@
   --background: #ffffff;
   --foreground: #171717;
   /* 포인트 컬러: 전송 버튼, 사용자 말풍선, 선택형 UI의 hover/active 강조에 쓴다 */
-  --accent: #2563eb;
-  --accent-foreground: #ffffff;
+  --accent: #7dd3fc;
+  --accent-foreground: #0c4a6e;
 }
 
 @theme inline {
