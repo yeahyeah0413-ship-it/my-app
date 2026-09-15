@@ -207,7 +207,7 @@ function departmentNotes(entry: GuideEntry, department: Department | null): stri
     }
     if (note === "approver") {
       const owner = OWNERS_BY_BOX[info.approvalBox];
-      lines.push(`[${department}] 매입 담당은 ${owner.team} ${owner.name}입니다.`);
+      lines.push(`[${department}] 재경팀 합의자는 ${owner.team} ${owner.name}입니다.`);
     }
     if (note === "chairmanException") {
       lines.push(
