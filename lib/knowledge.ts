@@ -177,7 +177,7 @@ export const GUIDE_ENTRIES: GuideEntry[] = [
           { id: "n1", cells: ["100만원 이하", "팀장"] },
           { id: "n2", cells: ["100만원 초과 ~ 200만원 이하", "팀장·실장"] },
           { id: "n3", cells: ["200만원 초과 ~ 1,000만원 이하", "팀장·실장·본부장·C-LEVEL"] },
-          { id: "n4", cells: ["1,000만원 초과", "여기에 CFO·CEO 추가"] },
+          { id: "n4", cells: ["1,000만원 초과", "팀장·실장·본부장·C-LEVEL·CFO·CEO"] },
           { id: "n5", cells: ["3,000만원 초과 (특정 부서)", "의장 전결"] },
         ],
       },
