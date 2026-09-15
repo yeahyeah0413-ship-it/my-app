@@ -185,37 +185,36 @@ export default function Page() {
   return (
     <div className="mx-auto flex h-dvh w-full max-w-3xl flex-col px-4 py-6">
       <header className="shrink-0 border-b border-black/10 pb-4 dark:border-white/15">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-xl font-semibold">품의서·지출결의서·경비규정 안내 챗봇</h1>
-            <p className="mt-1 text-sm opacity-60">
-              품의서·지출결의서 작성 기준과 경비 규정을 안내하고, 답변이 어려운 문의는 담당자를 안내해 드립니다.
-            </p>
-          </div>
-          <div className="flex shrink-0 gap-2">
-            {mode !== "select" && (
-              <button
-                onClick={() => setMode("select")}
-                className="rounded-full border border-black/15 px-3 py-1.5 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
-              >
-                처음으로
-              </button>
-            )}
-            {isAdmin && (
-              <Link
-                href="/admin"
-                className="rounded-full border border-black/15 px-3 py-1.5 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
-              >
-                관리자
-              </Link>
-            )}
+        <div className="flex justify-end gap-2">
+          {mode !== "select" && (
             <button
-              onClick={handleLogout}
-              className="rounded-full border border-black/15 px-3 py-1.5 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+              onClick={() => setMode("select")}
+              className="rounded-full border border-black/15 px-2.5 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
             >
-              로그아웃
+              처음으로
             </button>
-          </div>
+          )}
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="rounded-full border border-black/15 px-2.5 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+            >
+              관리자
+            </Link>
+          )}
+          <button
+            onClick={handleLogout}
+            className="rounded-full border border-black/15 px-2.5 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+          >
+            로그아웃
+          </button>
+        </div>
+
+        <div className="mt-2">
+          <h1 className="text-xl font-semibold">품의서·지출결의서·경비규정 안내 챗봇</h1>
+          <p className="mt-1 text-sm opacity-60">
+            품의서·지출결의서 작성 기준과 경비 규정을 안내하고, 답변이 어려운 문의는 담당자를 안내해 드립니다.
+          </p>
         </div>
 
         <label className="mt-4 flex items-center gap-2 text-sm">
