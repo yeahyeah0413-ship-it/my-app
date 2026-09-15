@@ -36,7 +36,7 @@ export default function LoginPage() {
     <div className="flex min-h-dvh items-center justify-center px-4">
       <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-6">
         <div>
-          <h1 className="text-xl font-semibold">품의서·지출결의서 작성 가이드 챗봇</h1>
+          <h1 className="text-xl font-semibold">품의서·지출결의서·경비규정 안내 챗봇</h1>
           <p className="mt-1 text-sm opacity-60">사내 계정으로 로그인해 주세요.</p>
         </div>
 

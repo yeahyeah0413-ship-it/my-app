@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "품의서·지출결의서 작성 가이드 챗봇",
-  description: "작성 기준을 안내하고, 해결되지 않는 문의는 담당자를 안내합니다.",
+  title: "품의서·지출결의서·경비규정 안내 챗봇",
+  description: "품의서·지출결의서 작성 기준과 경비 규정을 안내하고, 답변이 어려운 문의는 담당자를 안내해 드립니다.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

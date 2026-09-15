@@ -1,6 +1,6 @@
 "use client";
 
-// 품의서·지출결의서 작성 가이드 챗봇 화면.
+// 품의서·지출결의서·경비규정 안내 챗봇 화면.
 // 시작 시 "자주 묻는 질문에서 고르기"와 "직접 질문하기" 중 하나를 선택한 뒤,
 // 가이드 답변 또는 담당자 안내를 보여준다. (PRD 4번 이용 흐름)
 
@@ -187,9 +187,9 @@ export default function Page() {
       <header className="shrink-0 border-b border-black/10 pb-4 dark:border-white/15">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-xl font-semibold">품의서·지출결의서 작성 가이드 챗봇</h1>
+            <h1 className="text-xl font-semibold">품의서·지출결의서·경비규정 안내 챗봇</h1>
             <p className="mt-1 text-sm opacity-60">
-              작성 기준을 확인하고, 답변이 어려운 문의는 담당자를 안내해 드립니다.
+              품의서·지출결의서 작성 기준과 경비 규정을 안내하고, 답변이 어려운 문의는 담당자를 안내해 드립니다.
             </p>
           </div>
           <div className="flex shrink-0 gap-2">
