@@ -207,89 +207,102 @@ export default function Page() {
 
   return (
     <div className="mx-auto flex h-dvh w-full max-w-3xl flex-col px-4 py-6">
-      <header className="shrink-0 border-b border-black/10 pb-4 dark:border-white/15">
-        <div className="flex justify-end gap-2">
-          {mode !== "select" && (
-            <button
-              onClick={() => setMode("select")}
-              className="rounded-full border border-black/15 px-2.5 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
-            >
-              처음으로
-            </button>
-          )}
-          {isAdmin && (
-            <Link
-              href="/admin"
-              className="rounded-full border border-black/15 px-2.5 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
-            >
-              관리자
-            </Link>
-          )}
+      <div className="flex shrink-0 justify-end gap-2">
+        {mode !== "select" && (
           <button
-            onClick={handleLogout}
+            onClick={() => setMode("select")}
             className="rounded-full border border-black/15 px-2.5 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
           >
-            로그아웃
+            처음으로
           </button>
-        </div>
-
-        <div className="mt-2">
-          <h1 className="text-xl font-semibold">품의서·지출결의서·경비규정 안내 챗봇</h1>
-          <p className="mt-1 text-sm opacity-60">
-            품의서·지출결의서 작성 기준과 경비 규정을 안내하고, 답변이 어려운 문의는 담당자를 안내해 드립니다.
-          </p>
-        </div>
-
-        <label className="mt-4 flex items-center gap-2 text-sm">
-          <span className="opacity-70">소속</span>
-          <select
-            value={department}
-            onChange={(e) => setDepartment(e.target.value)}
-            className="rounded-md border border-black/15 bg-transparent px-2 py-1 text-sm dark:border-white/20"
+        )}
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className="rounded-full border border-black/15 px-2.5 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
           >
-            <option value="">선택 안 함</option>
-            {DEPARTMENTS.map((dept) => (
-              <option key={dept} value={dept}>
-                {dept}
-              </option>
-            ))}
-          </select>
-        </label>
-      </header>
+            관리자
+          </Link>
+        )}
+        <button
+          onClick={handleLogout}
+          className="rounded-full border border-black/15 px-2.5 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+        >
+          로그아웃
+        </button>
+      </div>
 
       {mode === "select" ? (
-        // 시작 화면: 이용 방법 선택
-        <div className="flex flex-1 flex-col justify-center gap-3">
-          <p className="text-sm opacity-60">어떻게 시작할까요?</p>
+        // 시작 화면: 제목·이용 방법 선택을 카드 하나로 묶어 위쪽에 배치한다 (소속 선택은 다음 화면에서)
+        <div className="flex flex-1 items-start justify-center pt-6">
+          <div className="w-full max-w-sm rounded-xl border border-black/10 bg-black/[0.02] p-5 shadow-sm dark:border-white/15 dark:bg-white/[0.03]">
+            <h1 className="text-lg font-semibold">품의서·지출결의서·경비규정 안내 챗봇</h1>
+            <p className="mt-1 text-xs leading-relaxed opacity-60">
+              품의서·지출결의서 작성 기준과 경비 규정을 안내하고, 답변이 어려운 문의는 담당자를 안내해 드립니다.
+            </p>
 
-          <button
-            onClick={() => setMode("faq")}
-            className="flex items-start gap-3 rounded-2xl border border-black/15 px-5 py-4 text-left hover:border-accent/50 hover:bg-accent/5 dark:border-white/20 dark:hover:bg-accent/10"
-          >
-            <IconList />
-            <span>
-              <span className="block font-medium">자주 묻는 질문에서 고르기</span>
-              <span className="mt-1 block text-sm opacity-60">
-                목록에서 골라 바로 답변을 확인합니다.
-              </span>
-            </span>
-          </button>
+            <div className="my-4 border-t border-black/10 dark:border-white/15" />
 
-          <button
-            onClick={() => setMode("free")}
-            className="flex items-start gap-3 rounded-2xl border border-black/15 px-5 py-4 text-left hover:border-accent/50 hover:bg-accent/5 dark:border-white/20 dark:hover:bg-accent/10"
-          >
-            <IconChat />
-            <span>
-              <span className="block font-medium">직접 질문하기</span>
-              <span className="mt-1 block text-sm opacity-60">
-                궁금한 내용을 자유롭게 입력합니다.
-              </span>
-            </span>
-          </button>
+            <p className="mb-2.5 text-xs opacity-60">어떻게 시작할까요?</p>
+
+            <div className="flex flex-col gap-2.5">
+              <button
+                onClick={() => setMode("faq")}
+                className="flex items-center gap-2.5 rounded-lg border border-black/15 p-3 text-left hover:border-accent/50 hover:bg-accent/5 dark:border-white/20 dark:hover:bg-accent/10"
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent/10">
+                  <IconList />
+                </span>
+                <span>
+                  <span className="block text-sm font-medium">자주 묻는 질문에서 고르기</span>
+                  <span className="block text-xs opacity-60">목록에서 골라 바로 답변을 확인합니다.</span>
+                </span>
+              </button>
+
+              <button
+                onClick={() => setMode("free")}
+                className="flex items-center gap-2.5 rounded-lg border border-black/15 p-3 text-left hover:border-accent/50 hover:bg-accent/5 dark:border-white/20 dark:hover:bg-accent/10"
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent/10">
+                  <IconChat />
+                </span>
+                <span>
+                  <span className="block text-sm font-medium">직접 질문하기</span>
+                  <span className="block text-xs opacity-60">궁금한 내용을 자유롭게 입력합니다.</span>
+                </span>
+              </button>
+            </div>
+
+            <p className="mt-3 text-[11px] opacity-40">소속 선택은 다음 화면에서 할 수 있습니다.</p>
+          </div>
         </div>
       ) : (
         <>
+          <header className="shrink-0 border-b border-black/10 pb-4 dark:border-white/15">
+            <div className="mt-2">
+              <h1 className="text-xl font-semibold">품의서·지출결의서·경비규정 안내 챗봇</h1>
+              <p className="mt-1 text-sm opacity-60">
+                품의서·지출결의서 작성 기준과 경비 규정을 안내하고, 답변이 어려운 문의는 담당자를 안내해 드립니다.
+              </p>
+            </div>
+
+            <label className="mt-4 flex items-center gap-2 text-sm">
+              <span className="opacity-70">소속</span>
+              <select
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+                className="rounded-md border border-black/15 bg-transparent px-2 py-1 text-sm dark:border-white/20"
+              >
+                <option value="">선택 안 함</option>
+                {DEPARTMENTS.map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </header>
+
           <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto py-6">
             {messages.length === 0 && (
               <p className="text-sm opacity-60">
