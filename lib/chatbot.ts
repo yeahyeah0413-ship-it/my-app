@@ -226,6 +226,30 @@ function isStaffQuestion(question: string): boolean {
   return /담당|누구|누가|문의/.test(question);
 }
 
+/**
+ * 챗봇 주제(경비·품의·지출결의·예산·자금·송금 등)와 조금이라도 관련 있는 질문인지 판단한다.
+ * 가이드 문서·업무분장에 있는 키워드를 그대로 재사용해, 별도 목록을 관리하지 않아도
+ * 새 항목이 늘어나면 자동으로 인식 범위도 넓어지게 한다.
+ * 여기 걸리지 않는 질문(날씨, 점심메뉴 등)은 담당자를 추측해 연결하지 않고 답변 불가로 안내한다.
+ */
+const TOPIC_KEYWORDS: string[] = [
+  "경비",
+  "품의",
+  "지출결의",
+  "예산",
+  "자금",
+  "송금",
+  ...GUIDE_ENTRIES.flatMap((entry) => entry.keywords),
+  ...STAFF_DIRECTORY.flatMap((staff) => staff.duties),
+];
+
+function isInScope(question: string): boolean {
+  const normalizedQuestion = normalize(question);
+  return TOPIC_KEYWORDS.some(
+    (keyword) => keyword.length >= 2 && normalizedQuestion.includes(normalize(keyword)),
+  );
+}
+
 /** 업무 키워드 점수만으로 재경팀 담당자를 찾는다. 트리거 단어 여부는 보지 않는다. */
 function scoreStaffMatches(question: string, department: Department | null): Staff[] | null {
   const normalizedQuestion = normalize(question);
@@ -273,12 +297,13 @@ function boxGroupLabel(box: "빨간색" | "파란색"): string {
   return box === "빨간색" ? "CPO·CIO·COO 소속 담당" : "그 외 소속 담당";
 }
 
-/** 찾은 담당자를 문장으로 만든다 */
+/** 찾은 담당자를 문장으로 만든다. 어떤 업무 때문에 이 담당자로 안내하는지 핵심 키워드를 함께 보여준다 */
 function describeStaff(matched: Staff[]): string {
+  const labels = [...new Set(matched.map((s) => s.label))].join("/");
   const names = matched
     .map((s) => `${s.team} ${s.name}${s.box ? ` (${boxGroupLabel(s.box)})` : ""}`)
     .join(", ");
-  return `${names}에게 문의해 주십시오.`;
+  return `${labels} 관련 문의는 ${names}에게 문의해 주십시오.`;
 }
 
 /** 질문에 대한 답변을 만든다 */
@@ -340,7 +365,16 @@ export function answerQuestion(
     };
   }
 
-  // 그래도 근거가 없으면 지어내지 않고 담당자를 안내한다
+  // 챗봇 주제와 아예 무관한 질문(날씨, 점심메뉴 등)은 담당자를 추측해 연결하지 않고 답변 불가로 안내한다
+  if (!isInScope(question)) {
+    return {
+      answered: false,
+      message:
+        "죄송합니다. 이 챗봇은 품의서·지출결의서 등 경비·예산 관련 문의만 답변드릴 수 있습니다. 문의하신 내용은 답변드리기 어렵습니다.",
+    };
+  }
+
+  // 주제와 관련은 있지만 근거가 없으면 지어내지 않고 담당자를 안내한다
   const owner = pickOwner(best?.category ?? null);
   return {
     answered: false,
