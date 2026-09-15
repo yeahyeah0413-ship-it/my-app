@@ -61,7 +61,7 @@ export default async function AdminPage() {
       .eq("feedback", "down"),
     supabase
       .from("chat_logs")
-      .select("question, department, category, created_at")
+      .select("question, department, category, created_at, answer")
       .eq("feedback", "down")
       .order("created_at", { ascending: false })
       .limit(50),
@@ -131,6 +131,7 @@ export default async function AdminPage() {
                   <th className="px-2.5 py-1.5 text-left font-medium">질문</th>
                   <th className="px-2.5 py-1.5 text-left font-medium">소속</th>
                   <th className="px-2.5 py-1.5 text-left font-medium">시각</th>
+                  <th className="px-2.5 py-1.5 text-left font-medium">답변 내용</th>
                 </tr>
               </thead>
               <tbody>
@@ -141,6 +142,7 @@ export default async function AdminPage() {
                     <td className="px-2.5 py-1.5 align-top opacity-70">
                       {new Date(row.created_at).toLocaleString("ko-KR")}
                     </td>
+                    <td className="px-2.5 py-1.5 align-top opacity-70">{row.answer ?? "-"}</td>
                   </tr>
                 ))}
               </tbody>

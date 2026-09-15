@@ -35,6 +35,7 @@ export async function POST(request: Request) {
         answered: answer.answered,
         category: answer.category ?? null,
         department,
+        answer: answer.message,
       }),
     )
     .catch(() => {});

@@ -406,7 +406,7 @@ export default function Page() {
                             onClick={() => sendFeedback(i, "up")}
                             className={
                               msg.feedback === "up"
-                                ? "rounded-full bg-yellow-200 p-1 text-yellow-700 dark:bg-yellow-300/30 dark:text-yellow-300"
+                                ? "rounded-full bg-accent/15 p-1 text-accent"
                                 : "rounded-full p-1 opacity-40 hover:opacity-80"
                             }
                           >
@@ -418,7 +418,7 @@ export default function Page() {
                             onClick={() => sendFeedback(i, "down")}
                             className={
                               msg.feedback === "down"
-                                ? "rounded-full bg-yellow-200 p-1 text-yellow-700 dark:bg-yellow-300/30 dark:text-yellow-300"
+                                ? "rounded-full bg-accent/15 p-1 text-accent"
                                 : "rounded-full p-1 opacity-40 hover:opacity-80"
                             }
                           >
