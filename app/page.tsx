@@ -134,6 +134,30 @@ function IconList() {
   );
 }
 
+/** 챗봇 제목 옆에 붙이는 작은 로봇 아이콘 */
+function IconRobot() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="size-5 shrink-0 text-accent"
+    >
+      <rect x="4" y="8" width="16" height="12" rx="3" />
+      <line x1="12" y1="8" x2="12" y2="4" />
+      <circle cx="12" cy="3" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="9" cy="14" r="1.3" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="14" r="1.3" fill="currentColor" stroke="none" />
+      <path d="M9 17.5h6" />
+      <line x1="2" y1="13" x2="4" y2="13" />
+      <line x1="20" y1="13" x2="22" y2="13" />
+    </svg>
+  );
+}
+
 function IconChat() {
   return (
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" className="size-5 shrink-0 text-accent">
@@ -297,7 +321,10 @@ export default function Page() {
         // 시작 화면: 제목·이용 방법 선택을 카드 하나로 묶어 위쪽에 배치한다 (소속 선택은 다음 화면에서)
         <div className="flex flex-1 items-start justify-center pt-6">
           <div className="w-full max-w-sm rounded-xl border border-black/10 bg-black/[0.02] p-5 shadow-sm dark:border-white/15 dark:bg-white/[0.03]">
-            <h1 className="text-lg font-semibold">품의서·지출결의서·경비규정 안내 챗봇</h1>
+            <div className="flex items-center gap-2">
+              <IconRobot />
+              <h1 className="text-lg font-semibold">품의서·지출결의서·경비규정 안내 챗봇</h1>
+            </div>
             <p className="mt-1 text-xs leading-relaxed opacity-60">
               품의서·지출결의서 작성 기준과 경비 규정을 안내하고, 답변이 어려운 문의는 담당자를 안내해 드립니다.
             </p>
@@ -335,6 +362,10 @@ export default function Page() {
             </div>
 
             <p className="mt-3 text-[11px] opacity-40">소속 선택은 다음 화면에서 할 수 있습니다.</p>
+
+            <p className="mt-2.5 border-t border-dashed border-black/10 pt-2 text-center text-[10px] opacity-40 dark:border-white/15">
+              이 챗봇은 재무본부에서 관리합니다
+            </p>
           </div>
         </div>
       ) : (
