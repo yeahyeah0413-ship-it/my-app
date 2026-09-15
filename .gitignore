@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 사내 규정 원문 (커밋하지 않음)
+/docs
+
+# 로컬 도구 상태 (bkit 런타임/로그, Claude 로컬 설정, Supabase CLI 임시 링크 정보)
+/.bkit
+/.claude
+/supabase/.temp
