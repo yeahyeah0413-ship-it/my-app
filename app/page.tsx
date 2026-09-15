@@ -159,16 +159,29 @@ function IconThumbDown({ filled }: { filled?: boolean }) {
   );
 }
 
-/** 자주 묻는 질문 목록 */
-const SAMPLE_QUESTIONS = [
-  "해외 출장비 국가별 급지가 어떻게 되나요?",
-  "해외 출장비 규정은 어떻게 되나요?",
-  "품의서(비용 관련) 전결 규정은 어떻게 되나요?",
-  "지출결의서 전결 규정은 어떻게 되나요?",
-  "사전 품의서가 없는 경우, 결재선은 어떻게 되나요?",
-  "접대비 한도는 어떻게 되나요?",
-  "법인카드 발급·분실 문의는 어디로 하면 되나요?",
-  "비용집행 프로세스가 어떻게 되나요?",
+/** 자주 묻는 질문 목록. 성격이 비슷한 질문끼리 묶어서 보여준다 */
+const FAQ_GROUPS: { label: string; questions: string[] }[] = [
+  {
+    label: "결재라인·전결규정",
+    questions: [
+      "품의서(비용 관련) 전결 규정은 어떻게 되나요?",
+      "지출결의서 전결 규정은 어떻게 되나요?",
+      "사전 품의서가 없는 경우, 결재선은 어떻게 되나요?",
+      "비용집행 프로세스가 어떻게 되나요?",
+    ],
+  },
+  {
+    label: "해외 출장",
+    questions: [
+      "해외 출장비 국가별 급지가 어떻게 되나요?",
+      "해외 출장비 규정은 어떻게 되나요?",
+      "해외 출장 항공비 한도가 어떻게 되나요?",
+    ],
+  },
+  {
+    label: "기타",
+    questions: ["접대비 한도는 어떻게 되나요?", "법인카드 발급·분실 문의는 어디로 하면 되나요?"],
+  },
 ];
 
 export default function Page() {
@@ -465,16 +478,28 @@ export default function Page() {
             ) : (
               <div className="space-y-3">
                 <p className="text-xs opacity-60">자주 묻는 질문</p>
-                <div className="flex flex-wrap gap-2">
-                  {SAMPLE_QUESTIONS.map((q) => (
-                    <button
-                      key={q}
-                      onClick={() => send(q)}
-                      disabled={loading}
-                      className="rounded-full border border-black/15 px-3 py-1.5 text-sm hover:border-accent/50 hover:bg-accent/5 disabled:opacity-40 dark:border-white/20 dark:hover:bg-accent/10"
+                <div className="max-h-64 space-y-3 overflow-y-auto pr-1">
+                  {FAQ_GROUPS.map((group) => (
+                    <div
+                      key={group.label}
+                      className="rounded-xl border border-black/10 p-3 dark:border-white/15"
                     >
-                      {q}
-                    </button>
+                      <span className="mb-2 inline-block rounded-full bg-accent/15 px-2.5 py-0.5 text-[11px] font-medium text-accent">
+                        {group.label}
+                      </span>
+                      <div className="flex flex-col">
+                        {group.questions.map((q) => (
+                          <button
+                            key={q}
+                            onClick={() => send(q)}
+                            disabled={loading}
+                            className="border-t border-black/10 py-2 text-left text-sm hover:text-accent disabled:opacity-40 dark:border-white/15"
+                          >
+                            {q}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
                 <button
