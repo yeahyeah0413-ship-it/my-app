@@ -1,5 +1,6 @@
 // Proxy(Next.js 16의 Middleware)에서 매 요청마다 세션을 갱신하고,
-// 로그인하지 않은 사용자를 /login으로 돌려보낸다.
+// 관리자 화면(/admin)에 로그인하지 않은 사용자가 접근하면 /login으로 돌려보낸다.
+// 챗봇 본문("/")은 로그인 없이 누구나 이용할 수 있다.
 // 서버 컴포넌트는 쿠키를 쓸 수 없어서, 세션 갱신은 여기서만 할 수 있다.
 
 import { createServerClient } from "@supabase/ssr";
@@ -33,17 +34,19 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  // 이 앱은 "/" 자체가 챗봇이라, 로그인 페이지를 뺀 전체를 막는다.
-  if (!user && !request.nextUrl.pathname.startsWith("/login")) {
+  // 관리자 화면만 로그인을 요구한다. 어디로 가려 했는지 redirect 쿼리로 남겨 로그인 후 이어서 갈 수 있게 한다.
+  if (!user && request.nextUrl.pathname.startsWith("/admin")) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    url.searchParams.set("redirect", request.nextUrl.pathname);
     return NextResponse.redirect(url);
   }
 
-  // 이미 로그인한 사용자가 로그인 페이지로 가면 챗봇으로 돌려보낸다.
+  // 이미 로그인한 사용자가 로그인 페이지로 가면, 원래 가려던 곳(없으면 챗봇)으로 돌려보낸다.
   if (user && request.nextUrl.pathname.startsWith("/login")) {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = request.nextUrl.searchParams.get("redirect") || "/";
+    url.search = "";
     return NextResponse.redirect(url);
   }
 

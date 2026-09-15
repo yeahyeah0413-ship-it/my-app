@@ -145,10 +145,12 @@ export default function Page() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getClaims().then(({ data }) => {
+      setIsLoggedIn(!!data?.claims);
       setIsAdmin(data?.claims?.app_metadata?.role === "admin");
     });
   }, []);
@@ -224,12 +226,21 @@ export default function Page() {
             관리자
           </Link>
         )}
-        <button
-          onClick={handleLogout}
-          className="rounded-full border border-black/15 px-2.5 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
-        >
-          로그아웃
-        </button>
+        {isLoggedIn ? (
+          <button
+            onClick={handleLogout}
+            className="rounded-full border border-black/15 px-2.5 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+          >
+            로그아웃
+          </button>
+        ) : (
+          <Link
+            href="/login"
+            className="rounded-full border border-black/15 px-2.5 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+          >
+            로그인
+          </Link>
+        )}
       </div>
 
       {mode === "select" ? (
@@ -277,14 +288,12 @@ export default function Page() {
           </div>
         </div>
       ) : (
-        <>
-          <header className="shrink-0 border-b border-black/10 pb-4 dark:border-white/15">
-            <div className="mt-2">
-              <h1 className="text-xl font-semibold">품의서·지출결의서·경비규정 안내 챗봇</h1>
-              <p className="mt-1 text-sm opacity-60">
-                품의서·지출결의서 작성 기준과 경비 규정을 안내하고, 답변이 어려운 문의는 담당자를 안내해 드립니다.
-              </p>
-            </div>
+        <div className="mt-4 flex flex-1 flex-col overflow-hidden rounded-xl border border-black/10 bg-black/[0.02] shadow-sm dark:border-white/15 dark:bg-white/[0.03]">
+          <header className="shrink-0 border-b border-black/10 px-5 pt-5 pb-4 dark:border-white/15">
+            <h1 className="text-xl font-semibold">품의서·지출결의서·경비규정 안내 챗봇</h1>
+            <p className="mt-1 text-sm opacity-60">
+              품의서·지출결의서 작성 기준과 경비 규정을 안내하고, 답변이 어려운 문의는 담당자를 안내해 드립니다.
+            </p>
 
             <label className="mt-4 flex items-center gap-2 text-sm">
               <span className="opacity-70">소속</span>
@@ -303,7 +312,7 @@ export default function Page() {
             </label>
           </header>
 
-          <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto py-6">
+          <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-5 py-6">
             {messages.length === 0 && (
               <p className="text-sm opacity-60">
                 {mode === "faq"
@@ -376,7 +385,7 @@ export default function Page() {
             {loading && <p className="text-sm opacity-50">답변을 찾고 있습니다…</p>}
           </div>
 
-          <div className="shrink-0 border-t border-black/10 pt-4 dark:border-white/15">
+          <div className="shrink-0 border-t border-black/10 px-5 pt-4 pb-5 dark:border-white/15">
             {mode === "free" ? (
               <form
                 onSubmit={(e) => {
@@ -423,7 +432,7 @@ export default function Page() {
               </div>
             )}
           </div>
-        </>
+        </div>
       )}
     </div>
   );

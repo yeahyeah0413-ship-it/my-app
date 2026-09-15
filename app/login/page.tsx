@@ -3,16 +3,25 @@
 // 이메일·비밀번호 로그인 화면. 계정은 관리자가 Supabase 대시보드에서 미리 만들어 둔다
 // (자율 가입 없음).
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -28,7 +37,8 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/");
+    // /admin처럼 로그인이 필요해 이 페이지로 온 경우, 원래 가려던 곳으로 이어서 보낸다
+    router.push(searchParams.get("redirect") || "/");
     router.refresh();
   }
 
