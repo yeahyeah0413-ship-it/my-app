@@ -174,7 +174,6 @@ const FAQ_GROUPS: { label: string; questions: string[] }[] = [
     questions: [
       "해외 출장비 국가별 급지가 어떻게 되나요?",
       "해외 출장비 규정은 어떻게 되나요?",
-      "해외 출장 항공비 한도가 어떻게 되나요?",
       "접대비 한도는 어떻게 되나요?",
     ],
   },
