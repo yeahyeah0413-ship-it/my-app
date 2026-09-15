@@ -309,14 +309,21 @@ export default function Page() {
 
                   {msg.source && <p className="text-xs opacity-60">근거: {msg.source}</p>}
 
-                  {msg.owner && (
-                    <div className="rounded-lg bg-black/5 px-3 py-2 text-xs dark:bg-white/10">
-                      <p className="font-medium">
-                        {msg.owner.team} {msg.owner.name}
-                      </p>
-                      <p className="opacity-70">{msg.owner.contact}</p>
-                    </div>
-                  )}
+                  {msg.owner &&
+                    (msg.owner.name === `${msg.owner.team} 담당자` ? (
+                      // 담당자 이름이 따로 없고 팀 명의로만 안내하는 경우 "OO팀 OO팀 담당자"처럼
+                      // 팀명이 중복 표시되지 않도록 문장으로 안내한다
+                      <div className="rounded-lg bg-black/5 px-3 py-2 text-xs dark:bg-white/10">
+                        <p className="font-medium">{msg.owner.team}에 문의하여 주십시오.</p>
+                      </div>
+                    ) : (
+                      <div className="rounded-lg bg-black/5 px-3 py-2 text-xs dark:bg-white/10">
+                        <p className="font-medium">
+                          {msg.owner.team} {msg.owner.name}
+                        </p>
+                        <p className="opacity-70">{msg.owner.contact}</p>
+                      </div>
+                    ))}
 
                   {msg.role === "bot" && msg.elapsedMs !== undefined && (
                     <p className="text-xs opacity-40">응답 {msg.elapsedMs}ms</p>
