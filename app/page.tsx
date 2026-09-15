@@ -67,7 +67,7 @@ function AnswerTables({ tables, highlightRowIds }: { tables: AnswerTable[]; high
               <thead>
                 <tr className="bg-black/5 dark:bg-white/10">
                   {table.headers.map((header, i) => (
-                    <th key={i} className="px-2.5 py-1.5 text-left font-medium">
+                    <th key={i} className="px-2.5 py-1.5 text-left font-medium tabular-nums">
                       {header}
                     </th>
                   ))}
@@ -82,11 +82,11 @@ function AnswerTables({ tables, highlightRowIds }: { tables: AnswerTable[]; high
                       className={
                         isHighlighted
                           ? "bg-yellow-200 font-semibold dark:bg-yellow-300/30"
-                          : "border-t border-black/10 dark:border-white/15"
+                          : "border-t border-black/10 even:bg-black/[0.02] dark:border-white/15 dark:even:bg-white/[0.03]"
                       }
                     >
                       {row.cells.map((cell, cellIndex) => (
-                        <td key={cellIndex} className="px-2.5 py-1.5 align-top">
+                        <td key={cellIndex} className="px-2.5 py-1.5 align-top tabular-nums">
                           {cell}
                         </td>
                       ))}
@@ -104,6 +104,29 @@ function AnswerTables({ tables, highlightRowIds }: { tables: AnswerTable[]; high
 
 /** 화면 모드: 시작 선택 / 자주 묻는 질문 / 직접 질문 */
 type Mode = "select" | "faq" | "free";
+
+/** 시작 화면의 두 선택지를 구분하기 위한 작은 아이콘 (라이브러리 추가 없이 최소 SVG만 사용) */
+function IconList() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" className="size-5 shrink-0 text-accent">
+      <path d="M6 5.5h10M6 10h10M6 14.5h10" strokeLinecap="round" />
+      <circle cx="2.5" cy="5.5" r="1" fill="currentColor" stroke="none" />
+      <circle cx="2.5" cy="10" r="1" fill="currentColor" stroke="none" />
+      <circle cx="2.5" cy="14.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function IconChat() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" className="size-5 shrink-0 text-accent">
+      <path
+        d="M3 5.5c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v6c0 1.1-.9 2-2 2H8l-3.5 3v-3H5c-1.1 0-2-.9-2-2v-6Z"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 /** 자주 묻는 질문 목록 */
 const SAMPLE_QUESTIONS = [
@@ -241,21 +264,27 @@ export default function Page() {
 
           <button
             onClick={() => setMode("faq")}
-            className="rounded-2xl border border-black/15 px-5 py-4 text-left hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+            className="flex items-start gap-3 rounded-2xl border border-black/15 px-5 py-4 text-left hover:border-accent/50 hover:bg-accent/5 dark:border-white/20 dark:hover:bg-accent/10"
           >
-            <span className="block font-medium">자주 묻는 질문에서 고르기</span>
-            <span className="mt-1 block text-sm opacity-60">
-              목록에서 골라 바로 답변을 확인합니다.
+            <IconList />
+            <span>
+              <span className="block font-medium">자주 묻는 질문에서 고르기</span>
+              <span className="mt-1 block text-sm opacity-60">
+                목록에서 골라 바로 답변을 확인합니다.
+              </span>
             </span>
           </button>
 
           <button
             onClick={() => setMode("free")}
-            className="rounded-2xl border border-black/15 px-5 py-4 text-left hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+            className="flex items-start gap-3 rounded-2xl border border-black/15 px-5 py-4 text-left hover:border-accent/50 hover:bg-accent/5 dark:border-white/20 dark:hover:bg-accent/10"
           >
-            <span className="block font-medium">직접 질문하기</span>
-            <span className="mt-1 block text-sm opacity-60">
-              궁금한 내용을 자유롭게 입력합니다.
+            <IconChat />
+            <span>
+              <span className="block font-medium">직접 질문하기</span>
+              <span className="mt-1 block text-sm opacity-60">
+                궁금한 내용을 자유롭게 입력합니다.
+              </span>
             </span>
           </button>
         </div>
@@ -278,7 +307,7 @@ export default function Page() {
                 <div
                   className={
                     msg.role === "user"
-                      ? "max-w-[85%] rounded-2xl bg-foreground px-4 py-2.5 text-sm text-background"
+                      ? "max-w-[85%] rounded-2xl bg-accent px-4 py-2.5 text-sm text-accent-foreground"
                       : "max-w-[85%] space-y-2 rounded-2xl border border-black/10 px-4 py-2.5 text-sm dark:border-white/15"
                   }
                 >
@@ -352,7 +381,7 @@ export default function Page() {
                 <button
                   type="submit"
                   disabled={loading || !input.trim()}
-                  className="rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background disabled:opacity-40"
+                  className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground disabled:opacity-40"
                 >
                   전송
                 </button>
@@ -366,7 +395,7 @@ export default function Page() {
                       key={q}
                       onClick={() => send(q)}
                       disabled={loading}
-                      className="rounded-full border border-black/15 px-3 py-1.5 text-sm hover:bg-black/5 disabled:opacity-40 dark:border-white/20 dark:hover:bg-white/10"
+                      className="rounded-full border border-black/15 px-3 py-1.5 text-sm hover:border-accent/50 hover:bg-accent/5 disabled:opacity-40 dark:border-white/20 dark:hover:bg-accent/10"
                     >
                       {q}
                     </button>
