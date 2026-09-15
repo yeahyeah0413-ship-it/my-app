@@ -329,7 +329,14 @@ export function answerQuestion(
     if (best.routeToOwner) {
       const owner =
         best.routeToOwner === true ? OWNERS_BY_CATEGORY[best.category] : best.routeToOwner;
-      return { answered: false, message: best.answer, owner };
+      return {
+        answered: false,
+        message: best.answer,
+        owner,
+        ...(best.tables ? { tables: best.tables } : {}),
+        ...(best.afterNote ? { afterNote: best.afterNote } : {}),
+        category: best.category,
+      };
     }
     const notes = departmentNotes(best, department);
     const amount = parseAmountWon(question);
@@ -370,7 +377,7 @@ export function answerQuestion(
     return {
       answered: false,
       message:
-        "죄송합니다. 이 챗봇은 품의서·지출결의서 등 경비·예산 관련 문의만 답변드릴 수 있습니다. 문의하신 내용은 답변드리기 어렵습니다.",
+        "죄송합니다. 이 챗봇은 품의서·지출결의서·경비 규정 관련 문의만 답변드릴 수 있습니다. 문의하신 내용은 답변드리기 어렵습니다.",
     };
   }
 
