@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { GUIDE_ENTRIES } from "@/lib/knowledge";
+import LogoutButton from "./logout-button";
 
 export default async function AdminPage() {
   const supabase = await createClient();
@@ -37,9 +38,12 @@ export default async function AdminPage() {
     <div className="mx-auto max-w-3xl px-4 py-8 text-sm">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-semibold">운영 현황 (관리자)</h1>
-        <Link href="/" className="rounded-full border border-black/15 px-3 py-1.5 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10">
-          챗봇으로
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/" className="rounded-full border border-black/15 px-3 py-1.5 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10">
+            챗봇으로
+          </Link>
+          <LogoutButton />
+        </div>
       </div>
 
       <section className="mb-8 grid grid-cols-3 gap-3">

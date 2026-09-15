@@ -4,12 +4,10 @@
 // 시작 시 "자주 묻는 질문에서 고르기"와 "직접 질문하기" 중 하나를 선택한 뒤,
 // 가이드 답변 또는 담당자 안내를 보여준다. (PRD 4번 이용 흐름)
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import type { HighlightRange } from "@/lib/chatbot";
 import { DEPARTMENTS, type AnswerTable, type Owner } from "@/lib/knowledge";
-import { createClient } from "@/lib/supabase/client";
 
 type Message = {
   role: "user" | "bot";
@@ -143,24 +141,6 @@ export default function Page() {
   const [department, setDepartment] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getClaims().then(({ data }) => {
-      setIsLoggedIn(!!data?.claims);
-      setIsAdmin(data?.claims?.app_metadata?.role === "admin");
-    });
-  }, []);
-
-  async function handleLogout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/login");
-    router.refresh();
-  }
 
   async function send(question: string) {
     const trimmed = question.trim();
@@ -218,29 +198,12 @@ export default function Page() {
             처음으로
           </button>
         )}
-        {isAdmin && (
-          <Link
-            href="/admin"
-            className="rounded-full border border-black/15 px-2.5 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
-          >
-            관리자
-          </Link>
-        )}
-        {isLoggedIn ? (
-          <button
-            onClick={handleLogout}
-            className="rounded-full border border-black/15 px-2.5 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
-          >
-            로그아웃
-          </button>
-        ) : (
-          <Link
-            href="/login"
-            className="rounded-full border border-black/15 px-2.5 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
-          >
-            로그인
-          </Link>
-        )}
+        <Link
+          href="/admin"
+          className="rounded-full border border-black/15 px-2.5 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+        >
+          관리자
+        </Link>
       </div>
 
       {mode === "select" ? (
