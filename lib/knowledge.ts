@@ -157,7 +157,7 @@ export const GUIDE_ENTRIES: GuideEntry[] = [
     category: "결재선",
     keywords: ["지출결의서", "지출결의", "결의서", "결재", "결재선", "전결", "사전품의"],
     answer:
-      "전자결재에서 본인의 조직도상 소속에 맞는 결재라인을 선택해야 합니다. 금액별 단계는 두 경우 모두 같습니다.",
+      "전자결재에서 본인의 조직도상 소속에 맞는 결재라인을 선택해야 하며, 결재선은 금액에 따라 아래와 같이 반영됩니다.",
     source: "지출결의서 결재라인 변경 안내(재경팀, 2026.07.28) / 지출결의서 전결규정",
     notes: ["approvalBox", "approver", "chairmanException"],
     tables: [
