@@ -25,6 +25,10 @@ type Message = {
   /** 표에서 강조할 행 id */
   highlightRowIds?: string[];
   elapsedMs?: number;
+  /** 이 답변의 chat_logs 행 id. 좋아요/싫어요를 이 값으로 이어붙인다 (봇 답변에만 있다) */
+  logId?: string;
+  /** 사용자가 고른 좋아요/싫어요. 아직 안 골랐으면 undefined, 취소하면 null */
+  feedback?: "up" | "down" | null;
 };
 
 /** text 중 highlights 좌표에 해당하는 부분만 강조 표시하도록 조각낸다 */
@@ -126,6 +130,35 @@ function IconChat() {
   );
 }
 
+/** 답변 만족도 피드백용 작은 손가락 아이콘. filled가 true면 그 답변에 선택된 상태다 */
+function IconThumbUp({ filled }: { filled?: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill={filled ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth="1.5"
+      className="size-3.5"
+    >
+      <path d="M7 8.5v8h-3v-8h3Zm0 0 3.2-5.5c.3-.5 1-.6 1.4-.2.5.5.7 1.2.5 1.9L11 8.5h4a1.8 1.8 0 0 1 1.7 2.5l-1.8 4.2a1.8 1.8 0 0 1-1.7 1.1H7" />
+    </svg>
+  );
+}
+
+function IconThumbDown({ filled }: { filled?: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill={filled ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth="1.5"
+      className="size-3.5"
+    >
+      <path d="M13 11.5v-8h3v8h-3Zm0 0-3.2 5.5c-.3.5-1 .6-1.4.2-.5-.5-.7-1.2-.5-1.9L9 11.5H5a1.8 1.8 0 0 1-1.7-2.5l1.8-4.2A1.8 1.8 0 0 1 6.8 3.7H13" />
+    </svg>
+  );
+}
+
 /** 자주 묻는 질문 목록 */
 const SAMPLE_QUESTIONS = [
   "해외 출장비 국가별 급지가 어떻게 되나요?",
@@ -171,6 +204,7 @@ export default function Page() {
           afterNote: data.afterNote,
           highlightRowIds: data.highlightRowIds,
           elapsedMs: data.elapsedMs,
+          logId: data.logId,
         },
       ]);
     } catch {
@@ -184,6 +218,27 @@ export default function Page() {
       requestAnimationFrame(() => {
         scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
       });
+    }
+  }
+
+  /** 답변 만족도 피드백을 보낸다. 이미 고른 것을 다시 누르면 선택을 취소한다 */
+  async function sendFeedback(messageIndex: number, picked: "up" | "down") {
+    const target = messages[messageIndex];
+    if (!target?.logId) return;
+
+    const next = target.feedback === picked ? null : picked;
+    setMessages((prev) =>
+      prev.map((m, i) => (i === messageIndex ? { ...m, feedback: next } : m)),
+    );
+
+    try {
+      await fetch("/api/chat/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ logId: target.logId, feedback: next }),
+      });
+    } catch {
+      // 피드백 저장 실패는 조용히 무시한다 (챗봇 이용에는 영향 없음)
     }
   }
 
@@ -338,8 +393,40 @@ export default function Page() {
                       </div>
                     ))}
 
-                  {msg.role === "bot" && msg.elapsedMs !== undefined && (
-                    <p className="text-xs opacity-40">응답 {msg.elapsedMs}ms</p>
+                  {msg.role === "bot" && (msg.elapsedMs !== undefined || msg.logId) && (
+                    <div className="flex items-center gap-2">
+                      {msg.elapsedMs !== undefined && (
+                        <p className="text-xs opacity-40">응답 {msg.elapsedMs}ms</p>
+                      )}
+                      {msg.logId && (
+                        <div className="ml-auto flex items-center gap-1">
+                          <button
+                            type="button"
+                            aria-label="답변이 도움 됐어요"
+                            onClick={() => sendFeedback(i, "up")}
+                            className={
+                              msg.feedback === "up"
+                                ? "rounded-full bg-yellow-200 p-1 text-yellow-700 dark:bg-yellow-300/30 dark:text-yellow-300"
+                                : "rounded-full p-1 opacity-40 hover:opacity-80"
+                            }
+                          >
+                            <IconThumbUp filled={msg.feedback === "up"} />
+                          </button>
+                          <button
+                            type="button"
+                            aria-label="답변이 도움 안 됐어요"
+                            onClick={() => sendFeedback(i, "down")}
+                            className={
+                              msg.feedback === "down"
+                                ? "rounded-full bg-yellow-200 p-1 text-yellow-700 dark:bg-yellow-300/30 dark:text-yellow-300"
+                                : "rounded-full p-1 opacity-40 hover:opacity-80"
+                            }
+                          >
+                            <IconThumbDown filled={msg.feedback === "down"} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

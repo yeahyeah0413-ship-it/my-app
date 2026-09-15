@@ -32,24 +32,50 @@ export default async function AdminPage() {
     );
   }
 
-  const [{ count: totalCount }, { count: unansweredCount }, { data: recentUnanswered }] =
-    await Promise.all([
-      supabase.from("chat_logs").select("*", { count: "exact", head: true }),
-      supabase
-        .from("chat_logs")
-        .select("*", { count: "exact", head: true })
-        .eq("answered", false),
-      supabase
-        .from("chat_logs")
-        .select("question, department, category, created_at")
-        .eq("answered", false)
-        .order("created_at", { ascending: false })
-        .limit(50),
-    ]);
+  const [
+    { count: totalCount },
+    { count: unansweredCount },
+    { data: recentUnanswered },
+    { count: feedbackUpCount },
+    { count: feedbackDownCount },
+    { data: recentDisliked },
+  ] = await Promise.all([
+    supabase.from("chat_logs").select("*", { count: "exact", head: true }),
+    supabase
+      .from("chat_logs")
+      .select("*", { count: "exact", head: true })
+      .eq("answered", false),
+    supabase
+      .from("chat_logs")
+      .select("question, department, category, created_at")
+      .eq("answered", false)
+      .order("created_at", { ascending: false })
+      .limit(50),
+    supabase
+      .from("chat_logs")
+      .select("*", { count: "exact", head: true })
+      .eq("feedback", "up"),
+    supabase
+      .from("chat_logs")
+      .select("*", { count: "exact", head: true })
+      .eq("feedback", "down"),
+    supabase
+      .from("chat_logs")
+      .select("question, department, category, created_at")
+      .eq("feedback", "down")
+      .order("created_at", { ascending: false })
+      .limit(50),
+  ]);
 
   const total = totalCount ?? 0;
   const unanswered = unansweredCount ?? 0;
   const answeredRate = total > 0 ? Math.round(((total - unanswered) / total) * 100) : null;
+
+  const feedbackUp = feedbackUpCount ?? 0;
+  const feedbackDown = feedbackDownCount ?? 0;
+  const feedbackTotal = feedbackUp + feedbackDown;
+  const satisfactionRate =
+    feedbackTotal > 0 ? Math.round((feedbackUp / feedbackTotal) * 100) : null;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 text-sm">
@@ -76,6 +102,53 @@ export default async function AdminPage() {
           <p className="text-xs opacity-60">답변률</p>
           <p className="text-lg font-semibold">{answeredRate === null ? "-" : `${answeredRate}%`}</p>
         </div>
+      </section>
+
+      <section className="mb-10 grid grid-cols-3 gap-3">
+        <div className="rounded-lg border border-black/10 p-3 dark:border-white/15">
+          <p className="text-xs opacity-60">👍 받은 답변</p>
+          <p className="text-lg font-semibold">{feedbackUp}</p>
+        </div>
+        <div className="rounded-lg border border-black/10 p-3 dark:border-white/15">
+          <p className="text-xs opacity-60">👎 받은 답변</p>
+          <p className="text-lg font-semibold">{feedbackDown}</p>
+        </div>
+        <div className="rounded-lg border border-black/10 p-3 dark:border-white/15">
+          <p className="text-xs opacity-60">만족도</p>
+          <p className="text-lg font-semibold">
+            {satisfactionRate === null ? "-" : `${satisfactionRate}%`}
+          </p>
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="mb-3 font-semibold">👎 받은 질문 (최근 50건)</h2>
+        {recentDisliked && recentDisliked.length > 0 ? (
+          <div className="overflow-x-auto rounded-lg border border-black/10 dark:border-white/15">
+            <table className="w-full border-collapse text-xs">
+              <thead>
+                <tr className="bg-black/5 dark:bg-white/10">
+                  <th className="px-2.5 py-1.5 text-left font-medium">질문</th>
+                  <th className="px-2.5 py-1.5 text-left font-medium">소속</th>
+                  <th className="px-2.5 py-1.5 text-left font-medium">시각</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentDisliked.map((row, i) => (
+                  <tr key={i} className="border-t border-black/10 dark:border-white/15">
+                    <td className="px-2.5 py-1.5 align-top">{row.question}</td>
+                    <td className="px-2.5 py-1.5 align-top opacity-70">{row.department ?? "-"}</td>
+                    <td className="px-2.5 py-1.5 align-top opacity-70">
+                      {new Date(row.created_at).toLocaleString("ko-KR")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="opacity-60">아직 싫어요를 받은 질문이 없습니다.</p>
+        )}
       </section>
 
       <section className="mb-10">
