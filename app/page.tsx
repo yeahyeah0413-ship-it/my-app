@@ -530,15 +530,15 @@ export default function Page() {
                 </button>
               </form>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <p className="text-xs opacity-60">자주 묻는 질문</p>
-                <div className="max-h-64 space-y-3 overflow-y-auto pr-1">
+                <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
                   {FAQ_GROUPS.map((group) => (
                     <div
                       key={group.label}
-                      className="rounded-xl border border-black/10 p-3 dark:border-white/15"
+                      className="rounded-xl border border-black/10 p-2.5 dark:border-white/15"
                     >
-                      <span className="mb-2 inline-block rounded-full bg-accent/15 px-2.5 py-0.5 text-[11px] font-medium text-accent">
+                      <span className="mb-1.5 inline-block rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-medium text-accent">
                         {group.label}
                       </span>
                       <div className="flex flex-col">
@@ -547,7 +547,7 @@ export default function Page() {
                             key={q}
                             onClick={() => send(q)}
                             disabled={loading}
-                            className="border-t border-black/10 py-2 text-left text-sm hover:text-accent disabled:opacity-40 dark:border-white/15"
+                            className="border-t border-black/10 py-1.5 text-left text-xs hover:text-accent disabled:opacity-40 dark:border-white/15"
                           >
                             {q}
                           </button>
