@@ -326,12 +326,16 @@ export default function Page() {
               <h1 className="text-lg font-semibold">품의서·지출결의서·경비규정 안내 챗봇</h1>
             </div>
             <p className="mt-1 text-xs leading-relaxed opacity-60">
-              품의서·지출결의서 작성 기준과 경비 규정을 안내하고, 답변이 어려운 문의는 담당자를 안내해 드립니다.
+              품의서·지출결의서 작성 기준과 경비 규정을 안내하고,
+              <br />
+              답변이 어려운 문의는 담당자를 안내해 드립니다.
             </p>
 
             <div className="my-4 border-t border-black/10 dark:border-white/15" />
 
-            <p className="mb-2.5 text-xs opacity-60">어떻게 시작할까요?</p>
+            <p className="mb-5 text-xs opacity-60">
+              안녕하세요! 무엇을 도와드릴까요?
+            </p>
 
             <div className="flex flex-col gap-2.5">
               <button
@@ -361,7 +365,7 @@ export default function Page() {
               </button>
             </div>
 
-            <p className="mt-3 text-[11px] opacity-40">소속 선택은 다음 화면에서 할 수 있습니다.</p>
+            <p className="mt-5 text-[11px] opacity-40">소속 선택은 다음 화면에서 할 수 있습니다.</p>
 
             <p className="mt-2.5 border-t border-dashed border-black/10 pt-2 text-center text-[10px] opacity-40 dark:border-white/15">
               이 챗봇은 재무본부에서 관리합니다
