@@ -23,22 +23,24 @@ export async function POST(request: Request) {
   const answer = answerQuestion(question, department);
 
   // 좋아요/싫어요 피드백을 나중에 이 질문에 이어붙일 수 있도록, id를 미리 만들어 응답에 함께 내려준다
-  // (로그 기록 완료를 기다리지 않아도 되어, 응답을 늦추지 않는다)
   const logId = randomUUID();
 
-  // 로그 기록은 응답을 늦추거나 막지 않는다 (실패해도 챗봇 답변에는 영향 없음)
-  createClient()
-    .then((supabase) =>
-      supabase.from("chat_logs").insert({
-        id: logId,
-        question,
-        answered: answer.answered,
-        category: answer.category ?? null,
-        department,
-        answer: answer.message,
-      }),
-    )
-    .catch(() => {});
+  // 이 insert가 끝나기 전에 응답을 돌려주면, 사용자가 답변을 보자마자 바로 피드백을 눌렀을 때
+  // 그 요청이 로그 행이 생기기도 전에 도착해 "성공"만 하고 실제로는 아무것도 갱신하지 못하는
+  // 경쟁 상태가 생긴다. 그래서 insert 완료까지는 기다리되, 실패해도 챗봇 답변에는 영향 없게 한다.
+  try {
+    const supabase = await createClient();
+    await supabase.from("chat_logs").insert({
+      id: logId,
+      question,
+      answered: answer.answered,
+      category: answer.category ?? null,
+      department,
+      answer: answer.message,
+    });
+  } catch {
+    // 로그 기록 실패는 조용히 무시한다
+  }
 
   return Response.json({ ...answer, elapsedMs: Date.now() - startedAt, logId });
 }
