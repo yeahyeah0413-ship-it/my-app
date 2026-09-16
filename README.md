@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 품의서·지출결의서 작성 가이드 챗봇
 
-## Getting Started
+사내 품의서·지출결의서 작성 기준을 안내하고, 챗봇으로 해결되지 않는 문의는 담당자에게 연결해 주는 재무본부용 챗봇 서비스입니다. (PoC)
 
-First, run the development server:
+## 배경
+
+품의서·지출결의서 관련 문의는 표준화된 안내 채널 없이 개별 문의 방식에 의존해 왔습니다. 그 결과 질문자가 담당이 아닌 재무팀원에게 문의하면 다시 담당자를 안내해야 하는 비효율이 반복되었습니다. 이 챗봇은 자주 나오는 질문을 챗봇이 먼저 해결하고, 그래도 해결되지 않는 문의만 적절한 담당자에게 연결하는 것을 목표로 합니다.
+
+자세한 배경·목표·범위는 [PRD.md](./PRD.md)를 참고하세요.
+
+## 주요 기능
+
+- **작성 가이드 응답**: 사내 가이드 문서에 근거한 내용만 답변하고, 근거가 없거나 확신이 없으면 담당자 안내로 넘깁니다.
+- **담당자 안내(라우팅)**: 질문자의 소속·부서와 문의 내용을 바탕으로 담당자를 안내하며, 매핑 정보가 없으면 임의로 추측하지 않고 기본 창구를 안내합니다.
+- **로그인**: 사전에 발급된 사내 계정(이메일/비밀번호)으로만 접근할 수 있습니다.
+- **운영 현황 대시보드**: 관리자 계정으로 로그인하면 전체 질문 수, 답변률, 미답변 질문, 피드백(👍/👎) 통계를 확인할 수 있습니다.
+
+## 기술 스택
+
+- Next.js (App Router) — 화면과 API를 한 프로젝트에서 처리
+- React 19 / TypeScript (strict 모드)
+- Tailwind CSS v4
+- Supabase (Auth, DB) — 로그인 및 문의 로그 저장
+- 배포: Vercel
+
+## 시작하기
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[http://localhost:3000](http://localhost:3000) 에서 확인할 수 있습니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+로컬 실행을 위해서는 `.env` 파일에 아래 값이 필요합니다.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+OPENAI_API_KEY=
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+```
 
-## Learn More
+## 범위가 아닌 것
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- 품의서·지출결의서 자동 작성/제출, 결재 시스템 연동
+- 재무본부 외 타 부서 문의 대응
+- 실제 개인정보·회사 기밀 데이터 연동 (가이드 문서만 참조)
